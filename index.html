@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Free Fire Sensitivity Tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #FFD700;
+    }
+
+    .ad-slot {
+      width: 100%;
+      height: 90px;
+      background-color: #333;
+      color: #aaa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 10px 0;
+      border: 2px dashed #444;
+    }
+
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 12px;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 8px 0 0 8px;
+      border: none;
+      font-size: 16px;
+      background-color: #222;
+      color: #fff;
+    }
+
+    button {
+      padding: 12px 20px;
+      background-color: #FFD700;
+      color: #000;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+    }
+
+    .divider {
+      border-top: 2px solid #FFD700;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 500px;
+    }
+
+    .device-list {
+      max-width: 600px;
+      margin: 20px auto;
+    }
+
+    .device-item {
+      background-color: #1a1a1a;
+      padding: 12px 16px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .device-item:hover {
+      background-color: #222;
+    }
+
+    .icon {
+      width: 6px;
+      height: 25px;
+      background-color: #FFD700;
+      border-radius: 2px;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #222;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .modal h2 { color: #FFD700; margin-bottom: 10px; }
+    .modal p { margin: 10px 0; }
+    .close-btn {
+      padding: 8px 15px;
+      background-color: #FFD700;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      margin: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔝 Ad Slot -->
+  <div class="ad-slot">Adsterra Top Ad</div>
+
+  <h1>Sensitivity Name:</h1>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search e.g. Infinix Hot 12" />
+    <button onclick="startRewardedAd()">Generate</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="device-list" id="deviceList"></div>
+
+  <!-- 🔻 Ad Slot -->
+  <div class="ad-slot">Adsterra Bottom Ad</div>
+
+  <!-- 🔥 Watch Ad Modal -->
+  <div class="modal" id="adModal">
+    <div class="modal-content" id="adModalContent">
+      <!-- dynamic -->
+    </div>
+  </div>
+
+  <!-- 🔥 Sensitivity Modal -->
+  <div class="modal" id="resultModal">
+    <div class="modal-content" id="resultContent">
+      <!-- dynamic -->
+    </div>
+  </div>
+
+  <script>
+    const samples = [
+      "Infinix Hot 30i", "iPhone 12", "Realme Narzo 50", "Samsung A14", "Vivo Y21",
+      "Xiaomi Redmi Note 12", "Tecno Camon 20", "Realme 11x", "Oppo F17", "Infinix Zero 30",
+      "OnePlus 9R", "iPhone 14 Pro"
+    ];
+
+    function updateSampleDevices() {
+      const list = document.getElementById("deviceList");
+      list.innerHTML = "";
+      const random = samples.sort(() => 0.5 - Math.random()).slice(0, 5);
+      random.forEach(device => {
+        const div = document.createElement("div");
+        div.className = "device-item";
+        div.innerHTML = `<div class="icon"></div><span>${device}</span>`;
+        div.onclick = () => startRewardedAd(device);
+        list.appendChild(div);
+      });
+    }
+
+    setInterval(updateSampleDevices, 5000);
+    updateSampleDevices();
+
+    function hashCode(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return hash;
+    }
+
+    function seededRandom(seed, min, max) {
+      const x = Math.abs(Math.sin(seed++) * 10000);
+      return Math.floor((x - Math.floor(x)) * (max - min + 1)) + min;
+    }
+
+    function getSensitivity(device) {
+      const seed = hashCode(device.toLowerCase());
+      return {
+        general: seededRandom(seed + 1, 100, 200),
+        redDot: seededRandom(seed + 2, 100, 200),
+        scope2x: seededRandom(seed + 3, 100, 200),
+        scope4x: seededRandom(seed + 4, 100, 200),
+        sniper: seededRandom(seed + 5, 100, 200),
+        freeLook: seededRandom(seed + 6, 100, 200),
+        fireButton: seededRandom(seed + 7, 45, 65),
+      };
+    }
+
+    let selectedDevice = "";
+
+    function startRewardedAd(deviceName = null) {
+      selectedDevice = deviceName || document.getElementById("searchInput").value.trim();
+      if (selectedDevice.length < 3) {
+        alert("Please enter a valid device name.");
+        return;
+      }
+
+      document.getElementById("adModalContent").innerHTML = `
+        <h2>Watch Ad to Get Sensitivity</h2>
+        <p>Click below to watch 15s ad & unlock sensitivity settings.</p>
+        <button class="close-btn" onclick="watchAd()">Watch Ad</button>
+        <button class="close-btn" onclick="closeModal()">Cancel</button>
+      `;
+      document.getElementById("adModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("adModal").style.display = "none";
+    }
+
+    function watchAd() {
+      const adLink = "https://fixingcreepingstarter.com/mc1p49n1?key=a39741a7496e5e9fe605e44021ebf11b"; // 🔁 Replace this with your actual Adsterra link
+      window.open(adLink, "_blank");
+
+      const adContent = document.getElementById("adModalContent");
+      let seconds = 15;
+      adContent.innerHTML = `
+        <h2>Ad is Playing...</h2>
+        <p>Please wait <strong id="timer">${seconds}</strong> seconds...</p>
+      `;
+
+      const interval = setInterval(() => {
+        seconds--;
+        const timer = document.getElementById("timer");
+        if (timer) timer.innerText = seconds;
+        if (seconds <= 0) {
+          clearInterval(interval);
+          document.getElementById("adModal").style.display = "none";
+          showResult();
+        }
+      }, 1000);
+    }
+
+    function showResult() {
+      const data = getSensitivity(selectedDevice);
+      document.getElementById("resultContent").innerHTML = `
+        <h2>${selectedDevice}</h2>
+        <p><strong>General:</strong> ${data.general}</p>
+        <p><strong>Red Dot:</strong> ${data.redDot}</p>
+        <p><strong>2x Scope:</strong> ${data.scope2x}</p>
+        <p><strong>4x Scope:</strong> ${data.scope4x}</p>
+        <p><strong>Sniper:</strong> ${data.sniper}</p>
+        <p><strong>Free Look:</strong> ${data.freeLook}</p>
+        <p><strong>Fire Button:</strong> ${data.fireButton}</p>
+        <button class="close-btn" onclick="document.getElementById('resultModal').style.display='none'">Close</button>
+      `;
+      document.getElementById("resultModal").style.display = "flex";
+    }
+  </script>
+</body>
+</html>
